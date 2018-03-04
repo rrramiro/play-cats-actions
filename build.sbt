@@ -17,3 +17,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-specs2" % "2.6.2" % "test",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )
+
+scalafmtTestOnCompile := true
+
+scalafmtOnCompile := true

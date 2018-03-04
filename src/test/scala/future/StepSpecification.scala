@@ -26,15 +26,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object StepSpecification extends Properties("Step") with StepFixtures {
-  property("left identity") = Prop.forAll{ (int: Int , f: Int => Step[String] )  =>
+  property("left identity") = Prop.forAll { (int: Int, f: Int => Step[String]) =>
     await(Step.unit[Int](int) flatMap f) == await(f(int))
   }
 
-  property("right identity") = Prop.forAll{ ( step: Step[String] )  =>
+  property("right identity") = Prop.forAll { (step: Step[String]) =>
     await(step flatMap Step.unit[String]) == await(step)
   }
 
-  property("associativity") = Prop.forAll{ (step: EitherT[Future, Result,Int], f: Int => EitherT[Future, Result,String], g: String => EitherT[Future, Result,Boolean]) =>
-    await((step flatMap f) flatMap g) == await(step flatMap(x => f(x) flatMap g))
+  property("associativity") = Prop.forAll {
+    (step: EitherT[Future, Result, Int],
+     f: Int => EitherT[Future, Result, String],
+     g: String => EitherT[Future, Result, Boolean]) =>
+      await((step flatMap f) flatMap g) == await(
+        step flatMap (x => f(x) flatMap g))
   }
 }
