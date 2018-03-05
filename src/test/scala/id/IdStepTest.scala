@@ -2,6 +2,7 @@ package id
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
+import cats.{Applicative, Id}
 import cats.data.Validated
 import org.scalatest.FunSuite
 import play.api.data.Form
@@ -9,9 +10,11 @@ import play.api.data.Forms._
 import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
 import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
 import play.api.mvc.Result
+
 import scala.util.{Failure, Success, Try}
 import cats.syntax.either._
-import io.kanaka.monadic.dsl.id._
+import fr.ramiro.play.cats.actions.id._
+
 import scala.language.higherKinds
 
 class IdStepTest extends FunSuite with StepFixtures {
@@ -39,17 +42,12 @@ class IdStepTest extends FunSuite with StepFixtures {
     whenStepReady(Some(42) ?| NotFound) { _ must be(42.asRight[Result]) }
     whenStepReady(None ?| NotFound) { _ must be(NotFound.asLeft[Int]) }
   }
-  //TODO
+
   test("Promote Either[B, A] to Step[A]") {
-    //fEitherToStepOps
-    //eitherToStepOps
-
-    //implicit def t[A, B, E[_,_] <: Either[A,B]](either: E[A, B]): dsl.id.StepOps[B, A] = eitherToStepOps(either.asInstanceOf[Either[A,B]])
-
-    whenStepReady(eitherToStepOps(42.asRight[String]) ?| NotFound) {
+    whenStepReady(42.asRight[String] ?| NotFound) {
       _ must be(42.asRight[Result])
     }
-    whenStepReady(eitherToStepOps("foo".asLeft[Int]) ?| (s => BadRequest(s))) {
+    whenStepReady("foo".asLeft[Int] ?| (s => BadRequest(s))) {
       checkFailingResult[Int](BAD_REQUEST, "foo")
     }
   }
@@ -80,10 +78,11 @@ class IdStepTest extends FunSuite with StepFixtures {
   test("Promote Boolean to Step[A]") {
     //booleanToStepOps
     //fBooleanToStepOps
+
     whenStepReady(booleanToStepOps(true) ?| NotFound) {
       _ must be(().asRight[Result])
     }
-    whenStepReady(booleanToStepOps(false) ?| NotFound) {
+    whenStepReady(fBooleanToStepOps(false) ?| NotFound) {
       _ must be(NotFound.asLeft[Unit])
     }
   }

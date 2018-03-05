@@ -1,20 +1,18 @@
-package io.kanaka.monadic
+package fr.ramiro.play.cats
 
-import cats.{Applicative, Id}
 import cats.data.{EitherT, Validated}
 import cats.effect.IO
+import cats.syntax.either._
+import cats.{Applicative, Id}
 import play.api.data.Form
 import play.api.libs.json.{JsPath, JsResult, JsonValidationError}
 import play.api.mvc.Result
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.{higherKinds, implicitConversions}
-import scala.util.Try
-import cats.syntax.either._
+import scala.util.{Either, Try}
 
-import scala.util.Either
-
-package object dsl {
+package object actions {
   type JsErrorContent = Seq[(JsPath, Seq[JsonValidationError])]
   type StepHandler[B] = (B => Result)
 
@@ -49,10 +47,10 @@ package object dsl {
       def -|(failureThunk: => Result): Step[A] = handle(_ => failureThunk)
     }
 
-    implicit def fEitherToStepOps[A, B](fEither: F[Either[B, A]])(
+    implicit def fEitherToStepOps[A, B, E[_,_] <: Either[_,_]](fEither: F[E[B, A]])(
         implicit mf: Applicative[F])
       : StepOps[A, B] = { (failureHandler: B => Result) =>
-      EitherT[F, Result, A](mf.map(fEither)(_.leftMap(failureHandler)))
+      EitherT[F, Result, A](mf.map(fEither.asInstanceOf[F[Either[B,A]]])(_.leftMap(failureHandler)))
     }
 
     implicit def fValidatedToStepOps[A, B](fEither: F[Validated[B, A]])(
@@ -66,7 +64,8 @@ package object dsl {
       fEitherToStepOps(mf.map(future)(b => Either.fromBoolean(b, ())))
     }
 
-    implicit def fOptionToStepOps[O[_] <: Option[_], A](fOption: F[O[A]])(
+    //TODO
+    implicit def fOptionToStepOps[A, O[_] <: Option[_]](fOption: F[O[A]])(
         implicit mf: Applicative[F]): StepOps[A, Unit] = {
       fEitherToStepOps(mf.map(fOption) { opt =>
         Either.fromOption(opt.asInstanceOf[Option[A]], ())

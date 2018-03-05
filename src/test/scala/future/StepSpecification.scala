@@ -17,7 +17,7 @@ package future
 
 import cats.data.EitherT
 import cats.instances.future._
-import io.kanaka.monadic.dsl.future._
+import fr.ramiro.play.cats.actions.future._
 import org.scalacheck.Prop._
 import org.scalacheck.{Prop, Properties}
 import play.api.mvc.Result

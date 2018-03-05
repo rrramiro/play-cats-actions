@@ -5,7 +5,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import cats.data.Validated
 import cats.effect._
 import cats.syntax.either._
-import io.kanaka.monadic.dsl.effect._
+import fr.ramiro.play.cats.actions.effect._
 import org.scalatest.FunSuite
 import play.api.data.Form
 import play.api.data.Forms._

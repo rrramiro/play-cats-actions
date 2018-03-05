@@ -3,7 +3,7 @@ package future
 import akka.stream.Materializer
 import cats.Applicative
 import cats.data.EitherT
-import io.kanaka.monadic.dsl.future.Step
+import fr.ramiro.play.cats.actions.future.Step
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalactic.source

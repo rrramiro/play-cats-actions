@@ -1,7 +1,7 @@
 package id
 
 import akka.stream.Materializer
-import io.kanaka.monadic.dsl.id._
+import fr.ramiro.play.cats.actions.id._
 import org.scalatest.{Assertion, MustMatchers}
 import play.api.http.Status
 import play.api.mvc.{Result, Results}

@@ -2,7 +2,7 @@ package effect
 
 import akka.stream.Materializer
 import cats.effect._
-import io.kanaka.monadic.dsl.effect._
+import fr.ramiro.play.cats.actions.effect._
 import org.scalactic.source
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, MustMatchers}
