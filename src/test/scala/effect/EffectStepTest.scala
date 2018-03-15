@@ -5,19 +5,17 @@ import akka.stream.{ActorMaterializer, Materializer}
 import cats.data.Validated
 import cats.effect._
 import cats.syntax.either._
-import fr.ramiro.play.cats.actions.effect._
 import org.scalatest.FunSuite
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.http.Status
 import play.api.i18n._
-import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
-import play.api.mvc.{Result, Results}
+import play.api.libs.json._
+import play.api.mvc.Result
 import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-class EffectStepTest extends FunSuite with StepFixtures {
+class EffectStepTest extends FunSuite with StepIOFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
 

@@ -11,28 +11,20 @@ import play.api.libs.json._
 import play.api.mvc.Result
 import scala.util.{Failure, Success, Try}
 import cats.syntax.either._
-import fr.ramiro.play.cats.actions.id._
 import scala.language.higherKinds
 
-class IdStepTest extends FunSuite with StepFixtures {
+class IdStepTest extends FunSuite with StepIdFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
-  //TODO
+
   test("Promote Id[A] to Step[A]") {
     whenStepReady(42 -| NotFound) { successful =>
       successful must be(42.asRight[Result])
     }
-//    whenStepReady(({throw new NullPointerException}: Int) -| NotFound) { failure =>
-//      failure must be(NotFound.asLeft[Int])
-//    }
   }
 
-  //TODO
   test("Escalate Id[A] to Step[A]") {
     whenStepReady(42 -| escalate) { _ must be(42.asRight[Result]) }
-//    an[NullPointerException] should be thrownBy {
-//      ({ throw new NullPointerException }:Int) -| escalate
-//    }
   }
 
   test("Promote Option[A] to Step[A]") {

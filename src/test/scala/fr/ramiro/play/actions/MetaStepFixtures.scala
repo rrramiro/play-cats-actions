@@ -1,32 +1,29 @@
-package future
+package fr.ramiro.play.actions
 
 import akka.stream.Materializer
-import fr.ramiro.play.cats.actions.future.Step
+import fr.ramiro.play.cats.actions.MetaStep
 import org.scalactic.source
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, MustMatchers}
 import play.api.http.Status
 import play.api.mvc.{Result, Results}
 
-import scala.concurrent.Await
+import scala.language.{higherKinds, implicitConversions}
 
-trait StepFixtures
+trait MetaStepFixtures[F[_]]
     extends ScalaFutures
     with MustMatchers
     with Results
-    with Status {
+    with Status { self: MetaStep[F] =>
 
-  def whenStepReady[T, U](step: Step[T])(fun: Either[Result, T] => U)(
+  def whenStepReady[A, B](step: Step[A])(block: Either[Result, A] => B)(
       implicit config: PatienceConfig,
-      pos: source.Position): U = {
-    whenReady[Either[Result, T], U](step.value)(fun)(config, pos)
-  }
+      pos: source.Position): B
 
-  def await[T](step: Step[T])(
-      implicit config: PatienceConfig): Either[Result, T] =
-    Await.result(step.value, config.timeout)
+  def await[A](step: Step[A])(
+      implicit config: PatienceConfig): Either[Result, A]
 
-  def checkFailingResult[T](status: Int, message: String)(r: Either[Result, T])(
+  def checkFailingResult[A](status: Int, message: String)(r: Either[Result, A])(
       implicit mat: Materializer): Assertion = r match {
     case Left(res) =>
       res.header.status must be(status)
