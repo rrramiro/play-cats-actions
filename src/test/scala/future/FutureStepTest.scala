@@ -19,11 +19,7 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-class FutureStepTest
-    extends FunSuite
-    with StepFixtures
-    with Results
-    with Status {
+class FutureStepTest extends FunSuite with StepFixtures {
 
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()

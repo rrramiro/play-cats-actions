@@ -1,16 +1,21 @@
 package effect
 
 import akka.stream.Materializer
-import cats.effect._
 import fr.ramiro.play.cats.actions.effect._
 import org.scalactic.source
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, MustMatchers}
-import play.api.mvc.Result
+import play.api.http.Status
+import play.api.mvc.{Result, Results}
+
 import scala.concurrent.Await
 import scala.language.postfixOps
 
-trait StepFixtures extends ScalaFutures with MustMatchers {
+trait StepFixtures
+    extends ScalaFutures
+    with MustMatchers
+    with Results
+    with Status {
 
   def whenStepReady[T, U](step: Step[T])(fun: Either[Result, T] => U)(
       implicit config: PatienceConfig,

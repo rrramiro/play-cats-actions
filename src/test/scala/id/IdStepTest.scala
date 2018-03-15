@@ -2,26 +2,23 @@ package id
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
-import cats.{Applicative, Id}
 import cats.data.Validated
 import org.scalatest.FunSuite
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.i18n.{DefaultMessagesApi, Lang, Messages, MessagesImpl}
-import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
+import play.api.i18n._
+import play.api.libs.json._
 import play.api.mvc.Result
-
 import scala.util.{Failure, Success, Try}
 import cats.syntax.either._
 import fr.ramiro.play.cats.actions.id._
-
 import scala.language.higherKinds
 
 class IdStepTest extends FunSuite with StepFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
   //TODO
-  test("Promote Future[A] to Step[A]") {
+  test("Promote Id[A] to Step[A]") {
     whenStepReady(42 -| NotFound) { successful =>
       successful must be(42.asRight[Result])
     }
@@ -31,7 +28,7 @@ class IdStepTest extends FunSuite with StepFixtures {
   }
 
   //TODO
-  test("Escalate Future[A] to Step[A]") {
+  test("Escalate Id[A] to Step[A]") {
     whenStepReady(42 -| escalate) { _ must be(42.asRight[Result]) }
 //    an[NullPointerException] should be thrownBy {
 //      ({ throw new NullPointerException }:Int) -| escalate
@@ -76,13 +73,10 @@ class IdStepTest extends FunSuite with StepFixtures {
   }
 
   test("Promote Boolean to Step[A]") {
-    //booleanToStepOps
-    //fBooleanToStepOps
-
-    whenStepReady(booleanToStepOps(true) ?| NotFound) {
+    whenStepReady(true ?| NotFound) {
       _ must be(().asRight[Result])
     }
-    whenStepReady(fBooleanToStepOps(false) ?| NotFound) {
+    whenStepReady(false ?| NotFound) {
       _ must be(NotFound.asLeft[Unit])
     }
   }
@@ -103,8 +97,6 @@ class IdStepTest extends FunSuite with StepFixtures {
   }
 
   test("Promote Validated[B,A] to Step[A]") {
-    //validatedToStep
-    //fValidatedToStepOps
     whenStepReady(
       validatedToStep(Validated.Valid(42): Validated[String, Int]) ?| NotFound) {
       _ must be(42.asRight[Result])

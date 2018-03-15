@@ -13,16 +13,11 @@ import play.api.http.Status
 import play.api.i18n._
 import play.api.libs.json.{JsError, JsResult, JsSuccess, Json}
 import play.api.mvc.{Result, Results}
-
 import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-class EffectStepTest
-    extends FunSuite
-    with StepFixtures
-    with Results
-    with Status {
+class EffectStepTest extends FunSuite with StepFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
 
