@@ -1,13 +1,15 @@
 package future
 
-import fr.ramiro.play.actions.MetaStepFixtures
-import fr.ramiro.play.cats.actions.MetaStepFuture
+import fr.ramiro.play.actions.SuperStepFixtures
+import fr.ramiro.play.cats.actions.StepFuture
 import org.scalactic.source
+import org.scalatest.Suite
 import play.api.mvc.Result
 
 import scala.concurrent.{Await, Future}
 
-trait StepFutureFixtures extends MetaStepFixtures[Future] with MetaStepFuture {
+trait StepFutureFixtures extends SuperStepFixtures[Future] with StepFuture {
+  self: Suite =>
   def whenStepReady[A, B](step: Step[A])(block: Either[Result, A] => B)(
       implicit config: PatienceConfig,
       pos: source.Position): B = whenReady(step.value)(block)(config, pos)

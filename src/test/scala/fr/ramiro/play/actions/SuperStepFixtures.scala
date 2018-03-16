@@ -1,20 +1,29 @@
 package fr.ramiro.play.actions
 
+import akka.actor.ActorSystem
 import akka.stream.Materializer
-import fr.ramiro.play.cats.actions.MetaStep
+import akka.testkit.TestKit
+import fr.ramiro.play.cats.actions.SuperStep
 import org.scalactic.source
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, MustMatchers}
+import org.scalatest.{Assertion, BeforeAndAfterAll, MustMatchers, Suite}
 import play.api.http.Status
 import play.api.mvc.{Result, Results}
 
 import scala.language.{higherKinds, implicitConversions}
 
-trait MetaStepFixtures[F[_]]
+trait SuperStepFixtures[F[_]]
     extends ScalaFutures
     with MustMatchers
     with Results
-    with Status { self: MetaStep[F] =>
+    with Status
+    with BeforeAndAfterAll { self: SuperStep[F] with Suite =>
+
+  def system: ActorSystem
+
+  override def afterAll {
+    TestKit.shutdownActorSystem(system)
+  }
 
   def whenStepReady[A, B](step: Step[A])(block: Either[Result, A] => B)(
       implicit config: PatienceConfig,

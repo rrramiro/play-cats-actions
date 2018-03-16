@@ -25,10 +25,10 @@ class FutureStepTest extends FunSuite with StepFutureFixtures {
   implicit lazy val materializer: Materializer = ActorMaterializer()
 
   test("Promote Future[A] to Step[A]") {
-    whenStepReady(Future.successful(42) -| NotFound) { successful =>
+    whenStepReady(Future.successful(42) ?| NotFound) { successful =>
       successful must be(42.asRight[Result])
     }
-    whenStepReady(Future.failed[Int](new NullPointerException) -| NotFound) {
+    whenStepReady(Future.failed[Int](new NullPointerException) ?| NotFound) {
       failure =>
         failure must be(NotFound.asLeft[Int])
     }

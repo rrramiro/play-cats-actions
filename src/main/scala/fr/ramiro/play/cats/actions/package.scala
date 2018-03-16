@@ -1,10 +1,13 @@
 package fr.ramiro.play.cats
 
+import cats.Id
+import cats.effect.IO
 import cats.syntax.either._
 import play.api.data.Form
 import play.api.libs.json._
 import play.api.mvc.Result
 
+import scala.concurrent.Future
 import scala.language.{higherKinds, implicitConversions}
 import scala.util.Either
 
@@ -12,11 +15,23 @@ package object actions {
   type JsErrorContent = Seq[(JsPath, Seq[JsonValidationError])]
   type StepHandler[B] = (B => Result)
 
-  object future extends MetaStepFuture
+  trait StepId extends SuperStep[Id] with DefaultStepOps[Id]
 
-  object id extends MetaStepId
+  trait StepFuture
+      extends SuperStep[Future]
+      with DefaultLiftedStepOps[Future]
+      with StepFutureImplicits
 
-  object effect extends MetaStepIO
+  trait StepIO
+      extends SuperStep[IO]
+      with DefaultLiftedStepOps[IO]
+      with StepEffectImplicits
+
+  object id extends StepId
+
+  object future extends StepFuture
+
+  object effect extends StepIO
 
   implicit class EitherObjectOpsPlay(val either: Either.type) {
     def fromForm[A](form: Form[A]): Either[Form[A], A] =

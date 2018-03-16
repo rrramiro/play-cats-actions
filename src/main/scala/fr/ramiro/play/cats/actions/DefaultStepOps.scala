@@ -1,7 +1,7 @@
 package fr.ramiro.play.cats.actions
 
 import cats.Applicative
-import cats.data.{EitherT, Validated}
+import cats.data.Validated
 import cats.syntax.either._
 import play.api.data.Form
 import play.api.libs.json.JsResult
@@ -10,18 +10,18 @@ import play.api.mvc.Result
 import scala.util.{Either, Try}
 import scala.language.{higherKinds, implicitConversions}
 
-trait DefaultStepOps[F[_]] { self: MetaStep[F] =>
+trait DefaultStepOps[F[_]] { self: SuperStep[F] =>
 
   implicit def eitherToStepOps[A, B](
       either: Either[B, A])(implicit mf: Applicative[F]): StepOps[A, B] = {
     (failureHandler: B => Result) =>
-      EitherT[F, Result, A](mf.pure(either.leftMap(failureHandler)))
+      Step(mf.pure(either.leftMap(failureHandler)))
   }
 
   implicit def validatedToStep[A, B](validated: Validated[B, A])(
       implicit mf: Applicative[F])
     : StepOps[A, B] = { (failureHandler: B => Result) =>
-    EitherT[F, Result, A](mf.pure(validated.leftMap(failureHandler).toEither))
+    Step(mf.pure(validated.leftMap(failureHandler).toEither))
   }
 
   implicit def optionToStepOps[A](option: Option[A])(
@@ -49,9 +49,8 @@ trait DefaultStepOps[F[_]] { self: MetaStep[F] =>
     eitherToStepOps(Either.fromTry(tryValue))
   }
 
-  implicit def fStepToResult[A](step: EitherT[F, A, A])(
-      implicit mf: Applicative[F]): F[A] = {
+  implicit def fStepToResult(step: Step[Result])(
+      implicit mf: Applicative[F]): F[Result] = {
     mf.map(step.value) { _.merge }
   }
-
 }

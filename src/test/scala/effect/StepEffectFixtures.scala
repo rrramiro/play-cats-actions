@@ -1,15 +1,17 @@
 package effect
 
 import cats.effect.IO
-import fr.ramiro.play.actions.MetaStepFixtures
-import fr.ramiro.play.cats.actions.MetaStepIO
+import fr.ramiro.play.actions.SuperStepFixtures
+import fr.ramiro.play.cats.actions.StepIO
 import org.scalactic.source
+import org.scalatest.Suite
 import play.api.mvc.Result
 
 import scala.concurrent.Await
 import scala.language.postfixOps
 
-trait StepIOFixtures extends MetaStepFixtures[IO] with MetaStepIO {
+trait StepEffectFixtures extends SuperStepFixtures[IO] with StepIO {
+  self: Suite =>
   def whenStepReady[A, B](step: Step[A])(block: Either[Result, A] => B)(
       implicit config: PatienceConfig,
       pos: source.Position): B =

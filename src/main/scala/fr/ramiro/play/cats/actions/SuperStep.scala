@@ -8,7 +8,7 @@ import play.api.mvc.Result
 import scala.util.Either
 import scala.language.{higherKinds, implicitConversions}
 
-trait MetaStep[F[_]] {
+trait SuperStep[F[_]] {
   type Step[A] = EitherT[F, Result, A]
 
   trait StepOps[A, B] extends (StepHandler[B] => Step[A]) {
@@ -17,8 +17,6 @@ trait MetaStep[F[_]] {
 
     def ?|(failureThunk: => Result): Step[A] = apply(_ => failureThunk)
   }
-
-  case object escalate
 
   object Step {
     def apply[A](step: F[Either[Result, A]]): Step[A] =
@@ -31,13 +29,12 @@ trait MetaStep[F[_]] {
       EitherT.leftT[F, A](r)
   }
 
-  abstract class AbstractEscalateOps[A, B](future: F[A], mf: Applicative[F]) {
-    def handle(function: StepHandler[B]): Step[A]
-    def -|(escalateWord: escalate.type): EitherT[F, Result, A] =
-      EitherT[F, Result, A](mf.map(future)(_.asRight[Result]))
+  case object escalate
 
-    def -|(failureHandler: StepHandler[B]): Step[A] = handle(failureHandler)
-    def -|(failureThunk: => Result): Step[A] = handle(_ => failureThunk)
+  implicit class AbstractEscalateOps[A, B](future: F[A])(
+      implicit mf: Applicative[F]) {
+    def -|(escalateWord: escalate.type): Step[A] =
+      Step(mf.map(future)(_.asRight[Result]))
   }
 
 }

@@ -15,15 +15,15 @@ import scala.concurrent.Future
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-class EffectStepTest extends FunSuite with StepIOFixtures {
+class EffectStepTest extends FunSuite with StepEffectFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
 
   test("Promote IO[A] to Step[A]") {
-    whenStepReady(IO.pure(42) -| NotFound) { successful =>
+    whenStepReady(IO.pure(42) ?| NotFound) { successful =>
       successful must be(42.asRight[Result])
     }
-    whenStepReady(IO.raiseError[Int](new NullPointerException) -| NotFound) {
+    whenStepReady(IO.raiseError[Int](new NullPointerException) ?| NotFound) {
       failure =>
         failure must be(NotFound.asLeft[Int])
     }
@@ -109,7 +109,7 @@ class EffectStepTest extends FunSuite with StepIOFixtures {
     }
   }
 
-  test("Promote Future[Option[A]] to Step[A]") {
+  test("Promote IO[Option[A]] to Step[A]") {
     whenStepReady(IO.pure(Option(42)) ?| NotFound) {
       _ must be(42.asRight[Result])
     }
@@ -118,7 +118,7 @@ class EffectStepTest extends FunSuite with StepIOFixtures {
     }
   }
 
-  test("properly promote Future[Either[B, A]] to Step[A]") {
+  test("properly promote IO[Either[B, A]] to Step[A]") {
     whenStepReady(IO.pure(42.asRight[String]) ?| NotFound) {
       _ must be(42.asRight[Result])
     }

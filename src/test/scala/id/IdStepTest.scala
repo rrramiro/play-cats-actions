@@ -17,13 +17,7 @@ class IdStepTest extends FunSuite with StepIdFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
   implicit lazy val materializer: Materializer = ActorMaterializer()
 
-  test("Promote Id[A] to Step[A]") {
-    whenStepReady(42 -| NotFound) { successful =>
-      successful must be(42.asRight[Result])
-    }
-  }
-
-  test("Escalate Id[A] to Step[A]") {
+  test("Escalate A to Step[A]") {
     whenStepReady(42 -| escalate) { _ must be(42.asRight[Result]) }
   }
 
