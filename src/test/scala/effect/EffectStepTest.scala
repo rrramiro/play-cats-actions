@@ -11,13 +11,18 @@ import play.api.data.Forms._
 import play.api.i18n._
 import play.api.libs.json._
 import play.api.mvc.Result
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 class EffectStepTest extends FunSuite with StepEffectFixtures {
   implicit lazy val system: ActorSystem = ActorSystem()
-  implicit lazy val materializer: Materializer = ActorMaterializer()
+  private lazy val executionContext: ExecutionContext =
+    implicitly[Materializer].executionContext
+  private implicit lazy val timer: Timer[IO] = IO.timer(executionContext)
+  private implicit lazy val cs: ContextShift[IO] =
+    IO.contextShift(executionContext)
 
   test("Promote IO[A] to Step[A]") {
     whenStepReady(IO.pure(42) ?| NotFound) { successful =>
@@ -149,7 +154,6 @@ class EffectStepTest extends FunSuite with StepEffectFixtures {
   }
 
   test("properly promote Future[A] to Step[A]") {
-    import scala.concurrent.ExecutionContext.Implicits.global
     whenStepReady(Future.successful(42) ?| NotFound) {
       _ must be(42.asRight[Result])
     }

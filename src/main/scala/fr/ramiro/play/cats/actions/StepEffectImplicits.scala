@@ -1,11 +1,10 @@
 package fr.ramiro.play.cats.actions
 
 import cats.Applicative
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 import cats.syntax.either._
 import play.api.mvc.Result
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait StepEffectImplicits { self: SuperStep[IO] =>
 
@@ -28,7 +27,7 @@ trait StepEffectImplicits { self: SuperStep[IO] =>
   }
 
   implicit def fEitherToStepOps[A](future: Future[A])(
-      implicit ec: ExecutionContext,
+      implicit cs: ContextShift[IO],
       mf: Applicative[IO]): StepOps[A, Throwable] = {
     effectToStepOps(IO.fromFuture(mf.pure(future)))
   }

@@ -22,7 +22,6 @@ import scala.util.{Failure, Success, Try}
 class FutureStepTest extends FunSuite with StepFutureFixtures {
 
   implicit lazy val system: ActorSystem = ActorSystem()
-  implicit lazy val materializer: Materializer = ActorMaterializer()
 
   test("Promote Future[A] to Step[A]") {
     whenStepReady(Future.successful(42) ?| NotFound) { successful =>
@@ -151,4 +150,18 @@ class FutureStepTest extends FunSuite with StepFutureFixtures {
       _ must be(NotFound.asLeft[Int])
     }
   }
+  /*
+  test("support filtering") {
+    whenStepReady((Future.successful(Option(20)) ?| NotFound).withFilter(_ < 42)) {
+      _ must be(20.asRight[Result])
+    }
+    whenStepReady((Future.successful[Option[Int]](None) ?| NotFound).withFilter(_ < 42)) {
+      _ must be(NotFound.asLeft[Int])
+    }
+
+    an [NoSuchElementException] must be thrownBy {
+      await((Future.successful(Option(64)) ?| NotFound).withFilter(_ < 42))
+    }
+  }
+ */
 }

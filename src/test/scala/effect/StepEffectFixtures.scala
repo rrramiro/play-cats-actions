@@ -1,6 +1,6 @@
 package effect
 
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 import fr.ramiro.play.actions.SuperStepFixtures
 import fr.ramiro.play.cats.actions.StepIO
 import org.scalactic.source
